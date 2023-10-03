@@ -1,0 +1,142 @@
+﻿@page "/"
+@using Lektion17Dist.Classes;
+@using Lektion17Dist.Services;
+@inject Data data
+
+<PageTitle>Index</PageTitle>
+
+<h1>Linq and Lambda</h1>
+
+@if(pet is not null)
+{
+    <h3>@pet.Name, @pet.Species, @pet.Id</h3>
+}
+
+<ol>
+    @foreach (var p in result)
+    {
+        <li>@p.Name, @p.Species</li>
+    }
+</ol>
+
+@if (error.Length > 0)
+{
+    <h3>@error</h3>
+}
+
+@if (animals is not null)
+{
+    <ul>
+        @foreach (var a in animals)
+        {
+            <li>String version: @a</li>
+        }
+    </ul>
+}
+
+@if (mamals is not null)
+{
+    <ul>
+        @foreach (var m in mamals)
+        {
+            <li>Mamals: @m.Id, @m.Species</li>
+        }
+    </ul>
+}
+
+<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+    <div class="btn-group me-2" role="group" aria-label="First group">
+        <button @onclick="@(() => names = data.Get(0, 3))" type="button" class="btn btn-primary">1</button>
+        <button @onclick="@(() => names = data.Get(1, 3))" type="button" class="btn btn-primary">2</button>
+        <button @onclick="@(() => names = data.Get(2, 3))" type="button" class="btn btn-primary">3</button>
+        <button @onclick="@(() => names = data.Get(3, 3))" type="button" class="btn btn-primary">4</button>
+        <button @onclick="@(() => names = data.GetWithUnion())" type="button" class="btn btn-primary">Union</button>
+    </div>
+</div>
+
+@if (names is not null)
+{
+    <ul>
+        @foreach (var n in names)
+        {
+            <li>@n</li>
+        }
+    </ul>
+}
+
+
+@code{
+    Pet? pet = null;
+    string error = string.Empty;
+    IEnumerable<string> animals;
+    IEnumerable<Mamal> mamals;
+
+    List<string> names = new();
+
+    List<Pet> result = new();
+
+    List<Pet> pets = new()
+    {
+        new Pet(10, "Fluffy", Species.Rabbit),
+        new Pet(2, "Spotty", Species.Cat),
+        new Pet(4, "Max", Species.Dog),
+        new Pet(5, "Lynx", Species.Cat)
+    };
+
+    protected override void OnInitialized()
+    {
+        error = string.Empty;
+
+        try
+        {
+            //pet = pets.FirstOrDefault(); // Fluffy (första i listan)
+            //pet = pets.FirstOrDefault(p => p.Species.Equals(Species.Cat)); // Spotty (första katten i listan)
+            //pet = pets.FirstOrDefault(p => p.Species.Equals(Species.Donkey)); // null (hittar ingen åsna)
+            //pet = pets.First(p => p.Species.Equals(Species.Donkey)); // Exception pga att ingen åsna finns i listan
+
+            //pet = pets.SingleOrDefault(p => p.Id.Equals(4)); //Max har Id 4
+            //pet = pets.SingleOrDefault(p => p.Id.Equals(3)); // Null efterson Id 3 saknas
+            //pet = pets.Single(p => p.Id.Equals(4)); // Max har id 4
+            //pet = pets.Single(p => p.Id.Equals(3));// Exception pga att id 3 saknas i listan
+
+            //if(result is not null)
+            //   result.AddRange(pets.Where(p => p.Species.Equals(Species.Cat)));
+
+            /*result = pets.Where(p =>
+                p.Species.Equals(Species.Cat) &&
+                p.Name.ToLower().StartsWith("l")
+            ).ToList();*/
+
+            /*** Select omvandlar objekten i en lista till andra objekt ***/
+
+            /*animals = pets.Where(p => p
+                .Species.Equals(Species.Cat))
+                .Select(s => $"{s.Name} {s.Species}");*/
+
+            //mamals = pets.Select(p => new Mamal(p.Id, p.Species.ToString()));
+
+            /*result = pets.Where(p =>p.Species.Equals(Species.Cat))
+                .OrderByDescending(o => o.Name).ToList();*/
+
+            //result = pets.OrderByDescending(o => o.Name).ToList();
+
+            //pets.Sort(); // Kräver IComparable<Pet> och CompareTo metoden för att sortera
+
+            //result = pets.Where(p => p.Species.Equals(Species.Cat)).Reverse().ToList();
+            //pets.Reverse(); // Vänder på hela listan
+
+            //var exists = pets.Any(p => p.Species == Species.Donkey);
+            //if (pets.Any(p => p.Species == Species.Donkey)) { }
+
+            /*** Konverterar från en objektstyp till en annan objektstyp ***/
+            /*mamals = pets.ConvertAll<Mamal>((pet) =>
+            {
+                return new Mamal(pet.Id, pet.Name);
+            });*/
+        }
+        catch
+        {
+            error = "Could not find a match.";
+        }
+    }
+}
